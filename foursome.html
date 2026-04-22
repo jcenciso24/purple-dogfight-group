@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,7 +36,7 @@
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .logo-icon {
@@ -60,11 +59,11 @@
         .title-section h1 {
             margin: 0;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
         
         .title-section .subtitle {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: #e1bee7;
         }
         
@@ -99,7 +98,7 @@
             color: white;
             padding: 12px 16px;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -109,7 +108,7 @@
             background: #ff9800;
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         
         .scorecard-table {
@@ -294,7 +293,7 @@
                 font-size: 11px;
             }
             .player-header {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
                 padding: 10px 12px;
             }
             .leaderboard-btn {
@@ -302,11 +301,11 @@
                 font-size: 12px;
             }
             .logo-icon {
-                width: 38px;
-                height: 38px;
+                width: 35px;
+                height: 35px;
             }
             .title-section h1 {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -316,12 +315,12 @@
 <div class="header">
     <div class="logo-section">
         <div class="logo-icon">
-            <img src="images/purpleDogFight.png" alt="Logo">
+            <img src="images/PDFLogo.png" alt="PDF Logo">
         </div>
-        <div class="title-section">
-            <h1>Purple Dogfight Group</h1>
-            <div class="subtitle">Foursome Scoring</div>
+        <div class="logo-icon">
+            <img src="images/purpleDogFight.png" alt="Purple Dogfight Logo">
         </div>
+       
     </div>
     <button class="leaderboard-btn" onclick="openLeaderboardModal()">
         🏆 Leaderboard
@@ -523,7 +522,7 @@
             const prizes = calculatePrizes(standings.length);
             const totalPool = standings.length * ENTRY_FEE;
             
-            let html = '<table style="width:100%"><thead><tr><th>Rank</th><th>Player</th><th>DF-Pts</th><th>Prize</th></tr></thead><tbody>';
+            let html = '<table style="width:100%"><thead>运转<th>Rank</th><th>Player</th><th>DF-Pts</th><th>Prize</th></tr></thead><tbody>';
             
             standings.forEach((player, idx) => {
                 let prize = '';
