@@ -317,7 +317,7 @@
         /* Desktop PC Styles - Larger Leaderboard */
         @media (min-width: 768px) {
             .modal-content {
-                max-width: 700px;
+                max-width: 800px;
             }
             .leaderboard-modal table {
                 font-size: 16px;
@@ -330,7 +330,7 @@
         
         @media (min-width: 1024px) {
             .modal-content {
-                max-width: 800px;
+                max-width: 900px;
             }
             .leaderboard-modal table {
                 font-size: 18px;
@@ -578,6 +578,7 @@
         });
     }
     
+    // LEADERBOARD with CURRENT HOLE column for each player
     async function renderLeaderboardModal() {
         document.getElementById('leaderboardModalContent').innerHTML = '<p>Loading global leaderboard...</p>';
         
@@ -593,12 +594,25 @@
             const standings = [];
             for (const player of data.players) {
                 let totalDF = 0;
+                // Calculate current hole for this player
+                let currentHole = 1;
                 for (let i = 0; i < 18; i++) {
-                    totalDF += calcDF(player.scores[i] || 0, PAR[i]);
+                    const score = player.scores[i] || 0;
+                    totalDF += calcDF(score, PAR[i]);
+                    if (score > 0) {
+                        currentHole = i + 2; // Next hole to play
+                    } else {
+                        break; // Stop at first empty hole
+                    }
                 }
+                // Check if all holes are complete
+                const isComplete = player.scores.every(score => score > 0);
+                
                 standings.push({ 
                     name: player.name, 
-                    dfPoints: totalDF
+                    dfPoints: totalDF,
+                    foursomeName: player.foursomeName || 'Unknown',
+                    currentHole: isComplete ? '🏁 Complete' : currentHole
                 });
             }
             standings.sort((a, b) => b.dfPoints - a.dfPoints);
@@ -606,7 +620,8 @@
             const prizes = calculatePrizes(standings.length);
             const totalPool = standings.length * ENTRY_FEE;
             
-            let html = '<table class="leaderboard-modal" style="width:100%"><thead><tr><th>Rank</th><th>Player</th><th>DF-Pts</th><th>Prize</th></tr></thead><tbody>';
+            // Table headers with Hole column
+            let html = '<table class="leaderboard-modal" style="width:100%"><thead>运转<th>Rank</th><th>Player</th><th>Group</th><th>Hole</th><th>DF-Pts</th><th>Prize</th></tr></thead><tbody>';
             
             standings.forEach((player, idx) => {
                 let prize = '';
@@ -614,12 +629,18 @@
                 else if (idx === 1 && prizes.second > 0) prize = `🥈 $${prizes.second}`;
                 else if (idx === 2 && prizes.third > 0) prize = `🥉 $${prizes.third}`;
                 const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : '';
+                
+                // Display current hole with golf flag emoji for numbers
+                const holeDisplay = typeof player.currentHole === 'number' ? `⛳ ${player.currentHole}` : player.currentHole;
+                
                 html += `<tr class="${rankClass}">
-                              <td>${idx + 1}</td>
-                              <td><strong>${player.name}</strong></td>
-                              <td>${player.dfPoints}</td>
-                              <td class="prize">${prize}</td>
-                            <tr>`;
+                             <td>${idx + 1}</td>
+                             <td><strong>${player.name}</strong></td>
+                             <td><small style="color:#6a1b9a;">${player.foursomeName}</small></td>
+                             <td>${holeDisplay}</td>
+                             <td>${player.dfPoints}</td>
+                             <td class="prize">${prize}</td>
+                           </tr>`;
             });
             
             html += `</tbody></table>`;
