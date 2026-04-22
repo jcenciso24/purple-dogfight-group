@@ -1,0 +1,574 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, viewport-fit=cover">
+    <title>Purple Dogfight - Foursome Scorecard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #2d1b4e;
+            margin: 0;
+            padding: 12px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6a1b9a, #4a148c);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .title-section h1 {
+            margin: 0;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        .title-section .subtitle {
+            font-size: 0.65rem;
+            color: #e1bee7;
+        }
+        
+        .leaderboard-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .leaderboard-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .player-scorecard {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .player-header {
+            background: linear-gradient(135deg, #6a1b9a, #4a148c);
+            color: white;
+            padding: 12px 16px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .player-total {
+            background: #ff9800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .scorecard-table {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            min-width: 550px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 3px;
+            text-align: center;
+        }
+        
+        th {
+            background: #f3e5f5;
+            color: #4a148c;
+            font-weight: 600;
+            font-size: 10px;
+        }
+        
+        .par-row td {
+            background: #f3e5f5;
+            font-weight: bold;
+        }
+        
+        .score-input {
+            width: 42px;
+            padding: 6px;
+            text-align: center;
+            font-size: 12px;
+            border: 2px solid #ce93d8;
+            border-radius: 6px;
+            background: white;
+        }
+        
+        .score-input:focus {
+            outline: none;
+            border-color: #6a1b9a;
+        }
+        
+        .df-points {
+            font-weight: bold;
+            color: #7b1fa2;
+        }
+        
+        .total-row {
+            background: #f3e5f5;
+            font-weight: bold;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #ce93d8;
+            margin-top: 16px;
+            padding: 8px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 20px;
+            padding: 0;
+            border-radius: 20px;
+            max-width: 500px;
+            margin: 60px auto;
+            position: relative;
+            animation: slideIn 0.3s ease;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #6a1b9a, #4a148c);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            width: auto;
+            font-weight: bold;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .leaderboard-modal table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: auto;
+        }
+        
+        .leaderboard-modal th {
+            background: transparent;
+            color: #4a148c;
+            border-bottom: 2px solid #6a1b9a;
+            padding: 10px 5px;
+            text-align: left;
+        }
+        
+        .leaderboard-modal td {
+            border: none;
+            border-bottom: 1px solid #eee;
+            padding: 10px 5px;
+            text-align: left;
+        }
+        
+        .rank-1 { background: #fff9c4; }
+        .rank-2 { background: #e8e8e8; }
+        .rank-3 { background: #ffe0b2; }
+        .prize { font-weight: bold; color: #7b1fa2; }
+        
+        .prize-pool-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f3e5f5;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        .refresh-modal-btn {
+            width: 100%;
+            padding: 12px;
+            background: #6a1b9a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .score-input {
+                width: 38px;
+                padding: 4px;
+                font-size: 11px;
+            }
+            .player-header {
+                font-size: 0.9rem;
+                padding: 10px 12px;
+            }
+            .leaderboard-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            .logo-icon {
+                width: 38px;
+                height: 38px;
+            }
+            .title-section h1 {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo-section">
+        <div class="logo-icon">
+            <img src="images/purpleDogFight.png" alt="Logo">
+        </div>
+        <div class="title-section">
+            <h1>Purple Dogfight Group</h1>
+            <div class="subtitle">Foursome Scoring</div>
+        </div>
+    </div>
+    <button class="leaderboard-btn" onclick="openLeaderboardModal()">
+        🏆 Leaderboard
+    </button>
+</div>
+
+<div id="playersContainer"></div>
+
+<div class="footer">
+    💜 DF Points: Eagle=8 | Birdie=4 | Par=2 | Bogey=1
+</div>
+
+<div id="leaderboardModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🏆 Global Leaderboard & Prize Money</h3>
+            <button class="close-modal-btn" onclick="closeLeaderboardModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="leaderboardModalContent">Loading...</div>
+            <button class="refresh-modal-btn" onclick="renderLeaderboardModal()">⟳ Refresh</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const PAR = [4,5,4,3,4,4,3,5,4,4,5,4,3,5,4,3,4,4];
+    const ENTRY_FEE = 20;
+    
+    function calculatePrizes(pc) {
+        if (pc === 2) return { first: 40, second: 0, third: 0 };
+        if (pc === 3) return { first: 40, second: 20, third: 0 };
+        const extra = (pc - 4) * 10;
+        return { first: 50 + extra, second: 30 + extra, third: 10 + extra };
+    }
+    
+    function calcDF(score, par) {
+        if (score === 0) return 0;
+        const diff = score - par;
+        if (diff === -2) return 8;
+        if (diff === -1) return 4;
+        if (diff === 0) return 2;
+        if (diff === 1) return 1;
+        return 0;
+    }
+    
+    let foursomeCode = window.location.pathname.split('/').pop();
+    let foursomeData = null;
+    
+    async function fetchData() {
+        try {
+            const res = await fetch(`/api/foursome/${foursomeCode}`);
+            const data = await res.json();
+            if (data.success) {
+                foursomeData = data;
+                renderAllScorecards();
+            } else {
+                document.body.innerHTML = '<div class="header"><h1>❌ Invalid Foursome Link</h1><p>Please contact the admin.</p></div>';
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+    
+    async function saveScore(playerIdx, holeIdx, score) {
+        const newScores = [...foursomeData.players[playerIdx].scores];
+        newScores[holeIdx] = parseInt(score) || 0;
+        await fetch(`/api/foursome/${foursomeCode}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerIndex: playerIdx, scores: newScores })
+        });
+        await fetchData();
+    }
+    
+    function renderAllScorecards() {
+        const container = document.getElementById('playersContainer');
+        let html = '';
+        
+        let parCells = '';
+        let frontPar = 0, backPar = 0;
+        for (let i = 0; i < 18; i++) {
+            parCells += `<td>${PAR[i]}</td>`;
+            if (i < 9) frontPar += PAR[i];
+            else backPar += PAR[i];
+        }
+        
+        foursomeData.players.forEach((player, playerIdx) => {
+            const playerScores = player.scores;
+            let frontScore = 0, backScore = 0, frontDF = 0, backDF = 0, totalDF = 0;
+            
+            for (let i = 0; i < 18; i++) {
+                const score = playerScores[i] || 0;
+                const df = calcDF(score, PAR[i]);
+                if (score > 0) {
+                    if (i < 9) frontScore += score;
+                    else backScore += score;
+                }
+                if (df > 0) {
+                    if (i < 9) frontDF += df;
+                    else backDF += df;
+                    totalDF += df;
+                }
+            }
+            const totalGross = frontScore + backScore;
+            
+            html += `
+                <div class="player-scorecard">
+                    <div class="player-header">
+                        <span>${player.name}</span>
+                        <span class="player-total">🏆 ${totalDF} pts | ⛳ ${totalGross}</span>
+                    </div>
+                    <div class="scorecard-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Hole</th>
+                                    ${Array.from({length: 18}, (_, i) => `<th>${i+1}</th>`).join('')}
+                                    <th>Out</th><th>In</th><th>Total</th><th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="par-row">
+                                    <td><strong>Par</strong></td>
+                                    ${parCells}
+                                    <td><strong>${frontPar}</strong></td>
+                                    <td><strong>${backPar}</strong></td>
+                                    <td><strong>${frontPar + backPar}</strong></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Score</strong></td>
+                                    ${playerScores.map((score, i) => `
+                                        <td><input type="number" class="score-input" data-player="${playerIdx}" data-hole="${i}" value="${score || ''}" placeholder="-"></td>
+                                    `).join('')}
+                                    <td><strong>${frontScore || '-'}</strong></td>
+                                    <td><strong>${backScore || '-'}</strong></td>
+                                    <td><strong>${totalGross || '-'}</strong></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DF-Pts</strong></td>
+                                    ${playerScores.map((score, i) => {
+                                        const df = calcDF(score || 0, PAR[i]);
+                                        return `<td class="df-points">${df > 0 ? df : '-'}</td>`;
+                                    }).join('')}
+                                    <td><strong>${frontDF || '-'}</strong></td>
+                                    <td><strong>${backDF || '-'}</strong></td>
+                                    <td><strong>${totalDF || '-'}</strong></td>
+                                    <td><strong>${totalDF || '-'}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        document.querySelectorAll('.score-input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const playerIdx = parseInt(e.target.dataset.player);
+                const holeIdx = parseInt(e.target.dataset.hole);
+                let value = parseInt(e.target.value);
+                if (isNaN(value)) value = 0;
+                if (value < 0) value = 0;
+                if (value > 20) value = 20;
+                saveScore(playerIdx, holeIdx, value);
+            });
+        });
+    }
+    
+    async function renderLeaderboardModal() {
+        document.getElementById('leaderboardModalContent').innerHTML = '<p>Loading global leaderboard...</p>';
+        
+        try {
+            const res = await fetch('/api/all-players');
+            const data = await res.json();
+            
+            if (!data.players || data.players.length === 0) {
+                document.getElementById('leaderboardModalContent').innerHTML = '<p>No players yet. Create foursomes in admin panel.</p>';
+                return;
+            }
+            
+            const standings = [];
+            for (const player of data.players) {
+                let totalDF = 0;
+                for (let i = 0; i < 18; i++) {
+                    totalDF += calcDF(player.scores[i] || 0, PAR[i]);
+                }
+                standings.push({ 
+                    name: player.name, 
+                    dfPoints: totalDF
+                });
+            }
+            standings.sort((a, b) => b.dfPoints - a.dfPoints);
+            
+            const prizes = calculatePrizes(standings.length);
+            const totalPool = standings.length * ENTRY_FEE;
+            
+            let html = '<table style="width:100%"><thead><tr><th>Rank</th><th>Player</th><th>DF-Pts</th><th>Prize</th></tr></thead><tbody>';
+            
+            standings.forEach((player, idx) => {
+                let prize = '';
+                if (idx === 0 && prizes.first > 0) prize = `🏆 $${prizes.first}`;
+                else if (idx === 1 && prizes.second > 0) prize = `🥈 $${prizes.second}`;
+                else if (idx === 2 && prizes.third > 0) prize = `🥉 $${prizes.third}`;
+                const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : '';
+                html += `<tr class="${rankClass}">
+                             <td>${idx + 1}</td>
+                             <td><strong>${player.name}</strong></td>
+                             <td>${player.dfPoints}</td>
+                             <td class="prize">${prize}</td>
+                           </tr>`;
+            });
+            
+            html += `</tbody></table>`;
+            html += `<div class="prize-pool-info">💰 Total Prize Pool: <strong>$${totalPool}</strong> (${standings.length} total players × $${ENTRY_FEE})</div>`;
+            
+            document.getElementById('leaderboardModalContent').innerHTML = html;
+        } catch (err) {
+            console.error(err);
+            document.getElementById('leaderboardModalContent').innerHTML = '<p>Error loading global leaderboard. Please refresh.</p>';
+        }
+    }
+    
+    function openLeaderboardModal() {
+        renderLeaderboardModal();
+        document.getElementById('leaderboardModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeLeaderboardModal() {
+        document.getElementById('leaderboardModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById('leaderboardModal');
+        if (event.target === modal) {
+            closeLeaderboardModal();
+        }
+    }
+    
+    fetchData();
+    setInterval(fetchData, 30000);
+</script>
+</body>
+</html>

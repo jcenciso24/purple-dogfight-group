@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+    <title>Purple Dogfight - Admin</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#2d1b4e;padding:20px}
+        .card{background:white;border-radius:16px;padding:20px;margin-bottom:20px}
+        input,button{padding:10px;margin:5px;border-radius:8px}
+        button{background:#6a1b9a;color:white;border:none;cursor:pointer}
+        .foursome-card{background:#f3e5f5;padding:15px;margin:10px 0;border-radius:8px}
+        .player-input-group{display:flex;gap:10px;margin-bottom:10px}
+        .player-input-group input{flex:1}
+        .add-player-btn{background:#2196f3;width:100%;margin-top:10px}
+        .link{color:#6a1b9a;word-break:break-all}
+        .header-flex{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+        .header-logo{width:50px;height:50px;border-radius:50%;object-fit:cover}
+        .header-title{margin:0;flex:1}
+        .logout-btn{margin-left:auto}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header-flex">
+        <img src="images/PDFLogo.png" alt="Logo" class="header-logo">
+        <h1 class="header-title">Purple Dogfight Group - Admin</h1>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+</div>
+
+<div class="card">
+    <h3>➕ Create New Foursome</h3>
+    <input type="text" id="foursomeName" placeholder="Foursome Name (e.g., Sunday Group)">
+    <div id="playersContainer">
+        <div class="player-input-group"><input type="text" class="player-name" placeholder="Player 1 name"></div>
+        <div class="player-input-group"><input type="text" class="player-name" placeholder="Player 2 name"></div>
+        <div class="player-input-group"><input type="text" class="player-name" placeholder="Player 3 name"></div>
+        <div class="player-input-group"><input type="text" class="player-name" placeholder="Player 4 name"></div>
+    </div>
+    <button class="add-player-btn" onclick="addPlayerField()">+ Add Another Player</button>
+    <button onclick="createFoursome()">🎯 Create Foursome</button>
+</div>
+
+<div class="card">
+    <h3>📋 Existing Foursomes</h3>
+    <div id="foursomesList">Loading...</div>
+</div>
+
+<script>
+    const ADMIN_KEY='purple123';
+    
+    async function verifyAdmin(){
+        let key=prompt('Enter admin key:');
+        if(key===ADMIN_KEY){
+            loadFoursomes();
+        }else{alert('Invalid key');window.location.href='/'}
+    }
+    
+    function addPlayerField(){
+        const container=document.getElementById('playersContainer');
+        const div=document.createElement('div');
+        div.className='player-input-group';
+        div.innerHTML='<input type="text" class="player-name" placeholder="Player name"><button onclick="this.parentElement.remove()" style="background:#f44336;margin:0">✖</button>';
+        container.appendChild(div);
+    }
+    
+    async function createFoursome(){
+        const foursomeName=document.getElementById('foursomeName').value.trim();
+        if(!foursomeName){alert('Enter foursome name');return;}
+        
+        const playerInputs=document.querySelectorAll('.player-name');
+        const playerNames=[];
+        playerInputs.forEach(input=>{if(input.value.trim())playerNames.push(input.value.trim());});
+        
+        if(playerNames.length<2){alert('Add at least 2 players');return;}
+        
+        const res=await fetch('/api/admin/create-foursome',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({key:ADMIN_KEY,foursomeName,playerNames})
+        });
+        const data=await res.json();
+        if(data.success){
+            alert(`✅ Foursome "${foursomeName}" created!\nShare this link:\n${window.location.origin}/foursome/${data.code}`);
+            loadFoursomes();
+            document.getElementById('foursomeName').value='';
+            document.querySelectorAll('.player-name').forEach(i=>i.value='');
+        }else{alert('Failed to create');}
+    }
+    
+    async function loadFoursomes(){
+        const res=await fetch('/api/admin/all-foursomes');
+        const data=await res.json();
+        if(data.foursomes.length===0){
+            document.getElementById('foursomesList').innerHTML='<p>No foursomes yet. Create one above.</p>';
+            return;
+        }
+        let html='';
+        for(const f of data.foursomes){
+            const playerList=f.players.map(p=>p.name).join(', ');
+            const foursomeUrl=`${window.location.origin}/foursome/${f.code}`;
+            html+=`<div class="foursome-card">
+                        <strong>${f.name}</strong><br>
+                        👥 Players: ${playerList}<br>
+                        🔗 Link: <a href="${foursomeUrl}" target="_blank" class="link">${foursomeUrl}</a><br>
+                        <button onclick="copyToClipboard('${foursomeUrl}')">📋 Copy Link</button>
+                        <button onclick="deleteFoursome('${f.code}')" style="background:#f44336">🗑️ Delete</button>
+                     </div>`;
+        }
+        document.getElementById('foursomesList').innerHTML=html;
+    }
+    
+    async function deleteFoursome(code){
+        if(confirm('Delete this foursome?')){
+            await fetch('/api/admin/delete-foursome',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({key:ADMIN_KEY,foursomeCode:code})
+            });
+            loadFoursomes();
+        }
+    }
+    
+    function copyToClipboard(text){navigator.clipboard.writeText(text);alert('Link copied!');}
+    
+    document.getElementById('logoutBtn').onclick=()=>{window.location.href='/'};
+    verifyAdmin();
+</script>
+</body>
+</html>

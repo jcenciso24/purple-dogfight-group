@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Purple Dogfight Group</title>
+    <style>
+        *{box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#2d1b4e 0%,#4a148c 100%);margin:0;padding:20px;min-height:100vh;display:flex;align-items:center;justify-content:center}
+        .card{background:white;border-radius:32px;padding:40px 30px;max-width:500px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.3);animation:fadeIn 0.5s ease}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+        .logo{width:120px;height:120px;margin:0 auto 20px}
+        .logo img{width:100%;height:100%;object-fit:contain}
+        .group-name{font-size:2rem;font-weight:bold;background:linear-gradient(135deg,#6a1b9a,#9c27b0);-webkit-background-clip:text;background-clip:text;color:transparent;margin:10px 0 5px}
+        .tagline{color:#7b1fa2;font-size:0.9rem;margin-bottom:30px;font-style:italic}
+        .admin-btn{background:linear-gradient(135deg,#ff9800,#f57c00);color:white;border:none;padding:14px 30px;border-radius:50px;cursor:pointer;font-size:16px;font-weight:bold;display:inline-block;text-decoration:none}
+        .admin-btn:active{transform:scale(0.98)}
+        .info-text{font-size:13px;color:#888;margin-top:20px;padding-top:20px;border-top:1px solid #eee}
+        .info-text strong{color:#6a1b9a}
+        @media(max-width:500px){.card{padding:30px 20px}.group-name{font-size:1.5rem}.logo{width:90px;height:90px}}
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">
+        <img src="images/PDFLogo.png" alt="Purple Dogfight Logo">
+    </div>
+    <div class="group-name">Purple Dogfight Group</div>
+    <div class="tagline">After Work Golf • Dogfight Points • Cash Prizes</div>
+    <a href="/admin"><button class="admin-btn">🔑 Admin Panel</button></a>
+    <div class="info-text"><strong>💜 How it works:</strong><br>Admin creates a foursome and shares ONE link.<br>All players use the same link to enter scores.</div>
+</div>
+</body>
+</html>
