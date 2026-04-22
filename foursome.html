@@ -36,10 +36,9 @@
         .logo-section {
             display: flex;
             align-items: center;
-	    justify-content: center;
+            justify-content: center;
             gap: 20px;
             flex: 1;	
-           
         }
         
         .logo-icon {
@@ -67,6 +66,22 @@
             color: #e1bee7;
         }
         
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .rules-btn {
+            background: #9c27b0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
         .leaderboard-btn {
             background: #ff9800;
             color: white;
@@ -76,12 +91,9 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         
-        .leaderboard-btn:active {
+        .rules-btn:active, .leaderboard-btn:active {
             transform: scale(0.97);
         }
         
@@ -238,6 +250,22 @@
             flex: 1;
         }
         
+        /* Rules List Styles */
+        .rules-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .rules-list li {
+            margin-bottom: 12px;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+        
+        .rules-list li strong {
+            color: #6a1b9a;
+        }
+        
         .leaderboard-modal table {
             width: 100%;
             border-collapse: collapse;
@@ -286,6 +314,33 @@
             margin-top: 15px;
         }
         
+        /* Desktop PC Styles - Larger Leaderboard */
+        @media (min-width: 768px) {
+            .modal-content {
+                max-width: 700px;
+            }
+            .leaderboard-modal table {
+                font-size: 16px;
+            }
+            .leaderboard-modal th,
+            .leaderboard-modal td {
+                padding: 12px 10px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .modal-content {
+                max-width: 800px;
+            }
+            .leaderboard-modal table {
+                font-size: 18px;
+            }
+            .leaderboard-modal th,
+            .leaderboard-modal td {
+                padding: 15px 12px;
+            }
+        }
+        
         @media (max-width: 600px) {
             .score-input {
                 width: 38px;
@@ -296,12 +351,11 @@
                 font-size: 0.9rem;
                 padding: 10px 12px;
             }
-            .leaderboard-btn {
+            .rules-btn, .leaderboard-btn {
                 padding: 8px 14px;
                 font-size: 12px;
             }
             .logo-icon {
-               
                 height: 60px;
             }
             .title-section h1 {
@@ -309,6 +363,10 @@
             }
             .title-section .subtitle {
                 font-size: 0.65rem;
+            }
+            .rules-list li {
+                font-size: 12px;
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -320,11 +378,11 @@
         <div class="logo-icon">
             <img src="/images/PDFLogo.png" alt="PDF Logo">
         </div>
-       
     </div>
-    <button class="leaderboard-btn" onclick="openLeaderboardModal()">
-        🏆 Leaderboard
-    </button>
+    <div class="button-group">
+        <button class="rules-btn" onclick="openRulesModal()">📖 Rules</button>
+        <button class="leaderboard-btn" onclick="openLeaderboardModal()">🏆 Leaderboard</button>
+    </div>
 </div>
 
 <div id="playersContainer"></div>
@@ -333,6 +391,7 @@
     💜 DF Points: Eagle=8 | Birdie=4 | Par=2 | Bogey=1
 </div>
 
+<!-- Leaderboard Modal -->
 <div id="leaderboardModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -342,6 +401,31 @@
         <div class="modal-body">
             <div id="leaderboardModalContent">Loading...</div>
             <button class="refresh-modal-btn" onclick="renderLeaderboardModal()">⟳ Refresh</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rules Modal -->
+<div id="rulesModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📖 House Rules</h3>
+            <button class="close-modal-btn" onclick="closeRulesModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <ul class="rules-list">
+                <li><strong>1.</strong> No Mulligans: One "breakfast ball" (free shot) on the first tee only.</li>
+                <li><strong>2.</strong> Gimmies should be "inside the putter grip" to prevent constant haggling.</li>
+                <li><strong>3.</strong> No Gimmes for Birdie: All birdie putts must be holed, even if they are short.</li>
+                <li><strong>4.</strong> In winter or wet conditions, allow "lift, clean, and place" within one scorecard length in your own fairway only.</li>
+                <li><strong>5.</strong> Agree on free relief from roots or rocks to protect clubs/prevent injury, but not when in a bunker or hazard.</li>
+                <li><strong>6.</strong> Treat OB as a lateral hazard (one-stroke penalty and drop at the edge) rather than stroke-and-distance, which speeds up play.</li>
+                <li><strong>7.</strong> All money must be collected before the first tee shot is hit.</li>
+                <li><strong>8.</strong> Clearly define payouts: 1st, 2nd, and 3rd place are based off Dogfight Points (DF-Points).</li>
+            </ul>
+            <div style="margin-top: 15px; padding: 10px; background: #f3e5f5; border-radius: 8px; text-align: center; font-size: 12px;">
+                💜 Play well, have fun, and good luck!
+            </div>
         </div>
     </div>
 </div>
@@ -522,7 +606,7 @@
             const prizes = calculatePrizes(standings.length);
             const totalPool = standings.length * ENTRY_FEE;
             
-            let html = '<table style="width:100%"><thead><tr><th>Rank</th><th>Player</th><th>DF-Pts</th><th>Prize</th></tr></thead><tbody>';
+            let html = '<table class="leaderboard-modal" style="width:100%"><thead><tr><th>Rank</th><th>Player</th><th>DF-Pts</th><th>Prize</th></tr></thead><tbody>';
             
             standings.forEach((player, idx) => {
                 let prize = '';
@@ -535,7 +619,7 @@
                               <td><strong>${player.name}</strong></td>
                               <td>${player.dfPoints}</td>
                               <td class="prize">${prize}</td>
-                            </tr>`;
+                            <tr>`;
             });
             
             html += `</tbody></table>`;
@@ -559,10 +643,24 @@
         document.body.style.overflow = 'auto';
     }
     
+    function openRulesModal() {
+        document.getElementById('rulesModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeRulesModal() {
+        document.getElementById('rulesModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
     window.onclick = function(event) {
-        const modal = document.getElementById('leaderboardModal');
-        if (event.target === modal) {
+        const leaderboardModal = document.getElementById('leaderboardModal');
+        const rulesModal = document.getElementById('rulesModal');
+        if (event.target === leaderboardModal) {
             closeLeaderboardModal();
+        }
+        if (event.target === rulesModal) {
+            closeRulesModal();
         }
     }
     
